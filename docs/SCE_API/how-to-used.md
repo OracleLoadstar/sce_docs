@@ -4,16 +4,19 @@ sidebar_position: 2
 
 # 如何使用 SCE API
 
-:::warning
-此页面已过时，部分内容可能不再适用，我们将很快更新
+:::info
+此页面正在重建，部分功能可能没有写入
 :::
 
 ### 1.1 SCE API 请求 & 响应格式
 
 ##### 1.1.1 获取支援卡列表
 
+请求:
 ```bash
-https://api.oraclestar.cn/api/umasce
+GET https://api.oraclestar.cn/api/umasce
+Header:
+{"x-api-key": "你的ApiKey"}
 ```
 
 响应:
@@ -41,7 +44,9 @@ https://api.oraclestar.cn/api/umasce
 ##### 1.1.2 获取单个支援卡数据
 
 ```bash
-https://api.oraclestar.cn/api/umasce?id=<id>
+GET https://api.oraclestar.cn/api/umasce?id=<id>
+Header:
+{"x-api-key": "你的ApiKey"}
 ```
 
 响应:
@@ -173,87 +178,19 @@ https://api.oraclestar.cn/api/umasce?id=<id>
 }
 ```
 
-### 1.2 示例代码
+### 1.2 错误响应 & 限制
 
-以下为使用各语言调用 SCE API 的示例代码：
+##### 1.2.1 错误响应
 
-Python
+|错误码|描述|样例|
+|---|---|---|
+|500|查询故障，例如服务不可用，查询参数错误|`HTTP 500: {"error":"所有数据库均无有效数据"}`|
+|401|鉴权失败|`HTTP 401: {"error":"无效的API Key"}`|
+|429|达到速率上限|`HTTP 429: {"error":"请求过于频繁，每分钟最多15次请求"}`|
 
-```python
-import requests
+##### 1.2.2 限制
+目前我们已经执行了部分速率限制:
 
-# 获取支援卡列表
-response = requests.get("https://api.oraclestar.cn/api/umasce")
-print(response.json())
+- RLM (Rate Limit Minute)
 
-# 获取单个支援卡数据
-card_id = "a1"
-response = requests.get(f"https://api.oraclestar.cn/api/umasce?id={card_id}")
-print(response.json())
-```
-
-JavaScript (Node.js)
-
-```javascript
-const axios = require('axios');
-// 获取支援卡列表
-axios.get('https://api.oraclestar.cn/api/umasce')
-    .then(response => {
-        console.log(response.data);
-    })
-    .catch(error => {
-        console.error(error);
-    });
-
-// 获取单个支援卡数据
-const cardId = "a1";
-axios.get(`https://api.oraclestar.cn/api/umasce?id=${cardId}`)
-    .then(response => {
-        console.log(response.data);
-    })
-    .catch(error => {
-        console.error(error);
-    });
-```
-
-Java
-
-```java
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-public class SCEApiExample {
-    public static void main(String[] args) {
-        try {
-            // 获取支援卡列表
-            URL url = new URL("https://api.oraclestar.cn/api/umasce");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-            System.out.println(content.toString());
-
-            // 获取单个支援卡数据
-            String cardId = "a1";
-            url = new URL("https://api.oraclestar.cn/api/umasce?id=" + cardId);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-            System.out.println(content.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
-```
+目前的RLM为15，即每分钟15次调用，如果您是开发者且有更多访问量的需求，你可以通过邮箱联系我们(oraclestar@oraclestar.cn)，或直接联系我们的项目运营(xingguangcuican666@foxmail.com)，我们会尽快为您处理。
